@@ -22,14 +22,16 @@ public class RequestHandler implements Runnable {
 	@Override
 	public void run() {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(soc.getInputStream()));
-			String s = reader.readLine();
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(soc.getOutputStream()));
-			writer.write("Server recived: " + s);
-			writer.flush();
-
-			
-			System.out.println(s);
+			while(true){
+				BufferedReader reader = new BufferedReader(new InputStreamReader(soc.getInputStream()));
+				String s = reader.readLine();
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(soc.getOutputStream()));
+				writer.write("Server recived: " + s);
+				writer.flush();
+	
+				
+				System.out.println(s);
+			}
 			
 			
 		} catch (IOException e) {

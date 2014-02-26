@@ -18,9 +18,8 @@ public class BasicHTTPClient {
 	public void sendMessage(String message) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 		writer.write(message);
+		writer.newLine();
 		writer.flush();
-		
-		
 	}
 	
 
