@@ -31,15 +31,14 @@ public class RequestHandler implements Runnable {
 	
 				
 				System.out.println(s);
+				
 			}
-			
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-
 	}
-
+	
 }
