@@ -21,6 +21,11 @@ public class BasicHTTPClient {
 		writer.newLine();
 		writer.flush();
 	}
+
+	public void checkCommand(String command) {
+		
+		
+	}
 	
 
 }
