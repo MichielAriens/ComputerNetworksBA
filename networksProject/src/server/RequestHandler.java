@@ -22,22 +22,38 @@ public class RequestHandler implements Runnable {
 		BufferedReader reader = null;
 		BufferedWriter writer = null;
 		try {
-
 				reader = new BufferedReader(new InputStreamReader(soc.getInputStream()));
-
-				String s = reader.readLine();
 				writer = new BufferedWriter(new OutputStreamWriter(soc.getOutputStream()));
+				
+				
+			
+				String s = reader.readLine();
 				writer.write("Server recived: " + s);
 				writer.flush();
 				proccomm.analyseCommand(s);
 				
+				int i = 1000;
+				while (i > 0){
+					writer.write(""+i);
+					writer.newLine();
+					i--;
+				}
+				try {
+					this.wait(5000);
+				} catch (InterruptedException e) {
+					System.out.println("interrupted");
+				}
+				writer.flush();
+				
 				System.out.println(s);
+				
+				
 				
 			
 			
 		} catch (IOException e) {
-			try {reader.close();} catch (IOException e1) {/*Well, fuck it...*/}	
-			try {writer.close();} catch (IOException e1) {/*Well, fuck it...*/}
+			try {reader.close();} catch (IOException e1) {/*Well, screw it...*/}	
+			try {writer.close();} catch (IOException e1) {/*Well, screw it...*/}
 		}
 	}
 	
