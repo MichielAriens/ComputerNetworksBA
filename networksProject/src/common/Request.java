@@ -17,6 +17,7 @@ public class Request {
 	public Request(String fullRequestString) {
 		String[] parts = fullRequestString.split(" ");
 		
+		
 	}
 
 	private String headers(){
