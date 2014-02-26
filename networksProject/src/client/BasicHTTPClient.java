@@ -1,5 +1,23 @@
 package client;
 
+
+/**
+ * 
+PUT /path/to/fail.txt HTTP/1.1 			//post en put
+Content-Length: 32
+
+the stuff i want to save 
+
+--------
+
+GET /index.html HTTP/1.0 				//get & head
+
+
+
+^2 lege lines
+
+ */
+
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;

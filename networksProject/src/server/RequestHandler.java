@@ -8,6 +8,8 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
+import common.Request;
+
 public class RequestHandler implements Runnable {
 	
 	private final Socket soc;
@@ -25,9 +27,11 @@ public class RequestHandler implements Runnable {
 				reader = new BufferedReader(new InputStreamReader(soc.getInputStream()));
 				writer = new BufferedWriter(new OutputStreamWriter(soc.getOutputStream()));
 				
+				String fullRequestString = reader.readLine();
+				Request request = new Request(fullRequestString);
 				
-			
-				String s = reader.readLine();
+				
+				
 				writer.write("Server recived: " + s);
 				writer.flush();
 				proccomm.analyseCommand(s);
