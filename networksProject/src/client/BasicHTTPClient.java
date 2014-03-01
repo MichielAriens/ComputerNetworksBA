@@ -26,6 +26,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+@SuppressWarnings("unused")
 public class BasicHTTPClient {
 	Scanner scan;
 	
@@ -40,7 +41,7 @@ public class BasicHTTPClient {
 			this.requestNewCommand();
 			return;
 		}
-		if(parts[2].equals("54321")){
+		if(!parts[2].equals("54321")){
 			System.out.println("You can only connect on port 54321(if you want to connect on our server)");
 			this.requestNewCommand();
 			return;
@@ -58,7 +59,7 @@ public class BasicHTTPClient {
 		if(parts[3].equals("HTTP/1.0")){
 			Receiver receiver = new Receiver(scan);
 			try {
-				receiver.sendRequest(command);
+				receiver.sendRequest(parts[0] + " " + parts[1] + " " + parts[4]);
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

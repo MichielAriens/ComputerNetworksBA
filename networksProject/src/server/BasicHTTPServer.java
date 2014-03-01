@@ -6,6 +6,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class BasicHTTPServer {
+	
+	//Max waiting time to complete a request.
+	public static final int TIMEOUT = 5000;
 
 	private ServerSocket acceptorSocket;
 	
@@ -24,7 +27,7 @@ public class BasicHTTPServer {
 	public void listen() throws IOException{
 		while(true){
 			Socket soc = acceptorSocket.accept();
-			RequestHandler h = new RequestHandler(soc);
+			ConnectionHandler h = new ConnectionHandler(soc);
 			Thread t = new Thread(h);
 			t.start();
 			
