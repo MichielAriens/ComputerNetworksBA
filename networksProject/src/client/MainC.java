@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class Main {
+public class MainC {
 		
 		public static void main(String[] args) {
 			BasicHTTPClient bhc= new BasicHTTPClient();

@@ -46,12 +46,16 @@ public class ConnectionHandler implements Runnable {
 				//contains the request being worked on.
 				Request activeRequest = null;
 				Response response = null;
+				boolean holdConnection = true;
 				
-				while(true){
+				while(holdConnection){
 					activeRequest = new Request(reader.readLine(),this);
 					activeRequest.grow();
-					response = new Response(activeRequest);
-				}		
+					if(activeRequest.getMode().equals("HTTP/1.0"))
+						holdConnection = false;
+					response = Response.getResponseTo(activeRequest, this);
+					response.printTo(writer);
+				}
 			
 		} catch (IOException e) {
 			try {reader.close();} catch (IOException e1) {/*Well, screw it...*/}	

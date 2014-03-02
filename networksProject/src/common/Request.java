@@ -100,17 +100,17 @@ public class Request extends Exchange{
 
 	public void grow() {
 		int emptyLines = 0;
-		long timeout = System.currentTimeMillis() + BasicHTTPServer.TIMEOUT;
+		//long timeout = System.currentTimeMillis() + BasicHTTPServer.TIMEOUT;
 		String nextLine;
 		//Read headers.
-		while(emptyLines < 1 && timeout < System.currentTimeMillis()){
+		while(emptyLines < 1 /*&& timeout < System.currentTimeMillis()*/){
 			nextLine = parent.readLine();
 			if(nextLine.equals("")){
 				emptyLines++;
 			}else{
 				headers += "\n" + nextLine;
 			}
-		}while(emptyLines < 2 && timeout < System.currentTimeMillis()){
+		}while(emptyLines < 2 /*&& timeout < System.currentTimeMillis()*/){
 			nextLine = parent.readLine();
 			if(nextLine.equals("")){
 				emptyLines++;

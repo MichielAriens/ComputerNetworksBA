@@ -59,7 +59,7 @@ public class BasicHTTPClient {
 		if(parts[3].equals("HTTP/1.0")){
 			Receiver receiver = new Receiver(scan);
 			try {
-				receiver.sendRequest(parts[0] + " " + parts[1] + " " + parts[4]);
+				receiver.sendRequest(parts[0] + " " + parts[1] + " " + parts[3]);
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
