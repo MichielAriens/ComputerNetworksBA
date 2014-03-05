@@ -30,9 +30,31 @@ public class ConnectionHandler implements Runnable {
 	
 	public String readLine(){
 		try {
-			return this.reader.readLine();
+			String s = this.reader.readLine();
+			System.out.println("read  >" + s);
+			
+			return s;
 		} catch (IOException e) {
 			return "";
+		}
+	}
+	
+	public void flush(){
+		try {
+			this.writer.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void writeLine(String line){
+		try {
+			this.writer.write(line);
+			this.writer.newLine();
+			System.out.println("wrote >" + line);
+		} catch (IOException e) {
+			return;
 		}
 	}
 
@@ -49,12 +71,12 @@ public class ConnectionHandler implements Runnable {
 				boolean holdConnection = true;
 				
 				while(holdConnection){
-					activeRequest = new Request(reader.readLine(),this);
+					activeRequest = new Request(this.readLine(),this);
 					activeRequest.grow();
 					if(activeRequest.getMode().equals("HTTP/1.0"))
 						holdConnection = false;
 					response = Response.getResponseTo(activeRequest, this);
-					response.printTo(writer);
+					response.printTo(this);
 				}
 			
 		} catch (IOException e) {

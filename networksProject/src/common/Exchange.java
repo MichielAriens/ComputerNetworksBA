@@ -6,41 +6,41 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Scanner;
 
+import server.ConnectionHandler;
+
 public abstract class Exchange {
 	
-
-
 	public String initialLine; //Initial response line		
-	public String headers = "";			
+	public String headers = "Host: localhost:54321";			
 	public String body = "";
 	public Exchange(String initialLine){
 		this.initialLine = initialLine;
 	}
+	
+	
 
 	
 	
-	public void printTo(BufferedWriter writer){
+	public void printTo(ConnectionHandler handler){
 		try{
-			writer.write(initialLine);
-			writer.newLine();
+			handler.writeLine(initialLine);
 			
 			BufferedReader reader = new BufferedReader(new StringReader(headers));
 			String line = "";
 			while((line = reader.readLine()) != null){
-				writer.write(line);
-				writer.newLine();
+				handler.writeLine(line);
 			}
-			writer.newLine();
+			handler.writeLine("");
 			
 			reader = new BufferedReader(new StringReader(body));
 			line = "";
 			while((line = reader.readLine()) != null){
-				writer.write(line);
-				writer.newLine();
+				handler.writeLine(line);
 			}
-			writer.newLine();
-			
-			writer.flush();
+			if(body != ""){
+				handler.writeLine("");
+			}
+			handler.flush();
 		}catch(IOException e){
 			
 		}

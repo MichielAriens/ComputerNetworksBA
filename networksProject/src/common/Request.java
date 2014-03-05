@@ -30,6 +30,10 @@ public class Request extends Exchange{
 		this.httpCommand = parts[0];
 		this.path = parts[1];
 		this.mode = parts[2];
+		
+		if(path.startsWith("/")){
+			path = path.substring(1);
+		}
 	}
 	
 
@@ -97,20 +101,21 @@ public class Request extends Exchange{
 
 
 
-
+	/**
+	 * 
+	 */
 	public void grow() {
 		int emptyLines = 0;
-		//long timeout = System.currentTimeMillis() + BasicHTTPServer.TIMEOUT;
 		String nextLine;
 		//Read headers.
-		while(emptyLines < 1 /*&& timeout < System.currentTimeMillis()*/){
+		while(emptyLines < 1){
 			nextLine = parent.readLine();
 			if(nextLine.equals("")){
 				emptyLines++;
 			}else{
 				headers += "\n" + nextLine;
 			}
-		}while(emptyLines < 2 /*&& timeout < System.currentTimeMillis()*/){
+		}while(emptyLines < 2 && this.hasBody()){
 			nextLine = parent.readLine();
 			if(nextLine.equals("")){
 				emptyLines++;
@@ -120,6 +125,11 @@ public class Request extends Exchange{
 		}
 		
 		
+	}
+
+
+	private boolean hasBody() {
+		return (this.httpCommand.equals("POST") || this.httpCommand.equals("PUT"));
 	}
 
 }
