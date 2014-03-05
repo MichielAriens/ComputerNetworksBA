@@ -22,6 +22,7 @@ public class Request extends Exchange{
 	
 	public Request(String initialLine, ConnectionHandler connectionHandler) throws IllegalExchangeException {
 		super(initialLine);
+		this.headers = "";
 		this.parent = connectionHandler;
 		String[] parts = initialLine.split(" ");
 		if(parts.length != 3){

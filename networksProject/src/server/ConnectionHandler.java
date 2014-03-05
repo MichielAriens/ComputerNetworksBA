@@ -24,6 +24,7 @@ public class ConnectionHandler implements Runnable {
 	public BufferedWriter writer = null;
 	
 	public ConnectionHandler(Socket soc) {
+		System.out.println("NEW THREAD!");
 		this.soc = soc;
 		this.requests = new ArrayList<Request>();
 	}

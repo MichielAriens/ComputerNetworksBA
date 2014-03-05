@@ -17,7 +17,7 @@ public abstract class Exchange {
 	
 	public boolean image = false;
 	public String initialLine; //Initial response line		
-	public String headers = "Host: localhost:54321";			
+	public String headers = "Host: localhost:54321\nServer: Waitress 1.0\n";		
 	public String body = "";
 	public Exchange(String initialLine){
 		this.initialLine = initialLine;
@@ -41,7 +41,7 @@ public abstract class Exchange {
 			if(body != ""){
 				handler.writer.flush();
 				InputStream input = new FileInputStream(body);
-				copyStream(input, handler.soc.getOutputStream());
+				linkStreams(input, handler.soc.getOutputStream());
 				handler.writeLine("");
 			}
 			handler.flush();
@@ -50,7 +50,7 @@ public abstract class Exchange {
 		}
 	}
 	
-	public static void copyStream(InputStream input, OutputStream output)
+	public static void linkStreams(InputStream input, OutputStream output)
 		    throws IOException
 		{
 		    byte[] buffer = new byte[1024]; // Adjust if you want
