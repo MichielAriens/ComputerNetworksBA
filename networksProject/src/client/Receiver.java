@@ -26,7 +26,7 @@ public class Receiver{
 		String[] parts = request.split(" ");
 		if(parts[0].equals("GET") || parts[0].equals("HEAD")){
 			writer.write(request);
-			writer.newLine();
+			writer.newLine();writer.newLine();
 			
 			writer.flush();
 		}else if(parts[0].equals("PUT") || parts[0].equals("POST")){
@@ -47,8 +47,8 @@ public class Receiver{
 			writer.write(request);
 			writer.newLine();
 			writer.write("Content-Length: "+message.getBytes().length);
-			writer.newLine(); writer.newLine();
-			writer.write(message); writer.newLine();
+			writer.newLine(); //writer.newLine();
+			writer.write(message); writer.newLine(); writer.newLine();
 			writer.flush();
 		}
 		if(parts[0].equals("PUT") || parts[0].equals("POST") || parts[0].equals("HEAD")){
@@ -58,7 +58,7 @@ public class Receiver{
 				System.out.println(currentLine);
 				currentLine=reader.readLine();
 			}
-		sock.close();
+		//sock.close();
 		}
 		
 	}
