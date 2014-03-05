@@ -17,11 +17,11 @@ import common.Response;
 
 public class ConnectionHandler implements Runnable {
 	
-	private final Socket soc;
+	public final Socket soc;
 	private List<Request> requests; // FIFO request queue on this ConnectionHandler.
 	
-	BufferedReader reader = null;
-	BufferedWriter writer = null;
+	public BufferedReader reader = null;
+	public BufferedWriter writer = null;
 	
 	public ConnectionHandler(Socket soc) {
 		this.soc = soc;
