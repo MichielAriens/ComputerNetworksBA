@@ -63,12 +63,12 @@ public class BasicHTTPClient {
 	}
 
 
-	private void executeWithReconnect(String URI) {
+	public void executeWithReconnect(String URI,String HTTPCommand) {
 		URI = this.deletehttpthing(URI);
 		String[] PortAndHost = this.splitPort(URI);
-		this.connect(PortAndHost[1], PortAndHost[1]);
+		this.connect(PortAndHost[1], PortAndHost[0]);
 		try {
-			receiver.sendRequest("GET"+ " "+ path+HTTPVersie, clientSock);
+			receiver.sendRequest(HTTPCommand+ " "+ path+" "+HTTPVersie, clientSock);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,12 +78,12 @@ public class BasicHTTPClient {
 		}
 	}
 
-	public void executeWithoutReconnect(String URI) {
+	public void executeWithoutReconnect(String URI,String HTTPCommand) {
 		URI = this.deletehttpthing(URI);
 		String[] portAndHost = this.splitPort(URI);
 		this.makePathAndHost(portAndHost[1]);
 		try {
-			receiver.sendRequest("GET"+ " "+ path+HTTPVersie, clientSock);
+			receiver.sendRequest(HTTPCommand+ " "+ path+" "+HTTPVersie, clientSock);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
