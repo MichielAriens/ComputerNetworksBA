@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,6 +17,17 @@ import common.Request;
 import common.Response;
 
 public class ConnectionHandler implements Runnable {
+	public static final List<String> COMMANDS;
+	public static final List<String> PROTOCOLS;
+	
+	static{
+		String[] arr = {"GET","POST","HEAD","PUT"};
+		COMMANDS = Arrays.asList(arr);
+		String[] arr1 = {"HTTP/1.0", "HTTP/1.1"};
+		PROTOCOLS = Arrays.asList(arr1);
+	}
+	
+	
 	
 	public final Socket soc;
 	private List<Request> requests; // FIFO request queue on this ConnectionHandler.
@@ -72,12 +84,15 @@ public class ConnectionHandler implements Runnable {
 				boolean holdConnection = true;
 				
 				while(holdConnection){
-					activeRequest = new Request(this.readLine(),this);
-					activeRequest.grow();
-					if(activeRequest.getMode().equals("HTTP/1.0") || activeRequest.toClose())
-						holdConnection = false;
-					response = Response.getResponseTo(activeRequest, this);
-					response.printTo(this);
+					String initLine = this.readLine();
+					if(wellFormed(initLine)){
+						activeRequest = new Request(initLine,this);
+						activeRequest.grow();
+						if(activeRequest.getMode().equals("HTTP/1.0") || activeRequest.toClose())
+							holdConnection = false;
+						response = Response.getResponseTo(activeRequest, this);
+						response.printTo(this);
+					}
 				}
 			
 		} catch (IOException e) {
@@ -85,6 +100,23 @@ public class ConnectionHandler implements Runnable {
 			try {writer.close();} catch (IOException e1) {/*Well, screw it...*/}
 		} catch (IllegalExchangeException e) {
 		}
+	}
+
+	private static boolean wellFormed(String initLine) {
+		if (initLine.equals(""))
+			return false;
+		
+		String[] parts = initLine.split(" ");
+		if(parts.length != 3)
+			return false;
+		
+		if(!COMMANDS.contains(parts[0]))
+			return false;
+	
+		if(!PROTOCOLS.contains(parts[2]))
+			return false;				
+				
+		return true;
 	}
 	
 }
