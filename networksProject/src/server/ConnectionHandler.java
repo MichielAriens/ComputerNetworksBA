@@ -74,7 +74,7 @@ public class ConnectionHandler implements Runnable {
 				while(holdConnection){
 					activeRequest = new Request(this.readLine(),this);
 					activeRequest.grow();
-					if(activeRequest.getMode().equals("HTTP/1.0"))
+					if(activeRequest.getMode().equals("HTTP/1.0") || activeRequest.toClose())
 						holdConnection = false;
 					response = Response.getResponseTo(activeRequest, this);
 					response.printTo(this);

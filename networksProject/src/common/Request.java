@@ -114,14 +114,14 @@ public class Request extends Exchange{
 			if(nextLine.equals("")){
 				emptyLines++;
 			}else{
-				headers += "\n" + nextLine;
+				headers += nextLine + "\n";
 			}
 		}while(emptyLines < 2 && this.hasBody()){
 			nextLine = parent.readLine();
 			if(nextLine.equals("")){
 				emptyLines++;
 			}else{
-				body += "\n" + nextLine;
+				body += nextLine + "\n";
 			}
 		}
 		
@@ -131,6 +131,11 @@ public class Request extends Exchange{
 
 	private boolean hasBody() {
 		return (this.httpCommand.equals("POST") || this.httpCommand.equals("PUT"));
+	}
+
+
+	public boolean toClose() {
+		return this.headers.contains("Connection: close");
 	}
 
 }

@@ -1,12 +1,14 @@
 package common;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -67,11 +69,11 @@ public class Response extends Exchange {
 	private static Response getResponseToPUT(Request request, ConnectionHandler handler) {
 		try {
 			File file = new File(request.getPath());
-			if(file.canWrite()){
+			if(!file.isFile()){
 				Response res = new Response(request.getMode() + " 200 OK", handler);
-				FileOutputStream out = new FileOutputStream(file);
-				StringReader in = new StringReader(request.getBody());
-				linkWriteToStream(in, out);
+				FileOutputStream out = new FileOutputStream(request.getPath());
+				InputStream in = new ByteArrayInputStream( request.getBody().getBytes( ) );
+				linkStreams(in, out);
 				return res;
 			}else{
 				return new Response(request.getMode() + " 404 Not Found", request.parent);
@@ -79,7 +81,6 @@ public class Response extends Exchange {
 		} catch (IOException e) {
 			return new Response(request.getMode() + " 404 Not Found", request.parent);
 		}
-		
 	}
 	
 	private static Response getResponseToGET(Request request, ConnectionHandler handler) {
@@ -101,6 +102,17 @@ public class Response extends Exchange {
 		    byte[] buffer = new byte[1024]; // Adjust if you want
 		    int bytesRead;
 		    while ((bytesRead = input.read()) != -1)
+		    {
+		        output.write(buffer, 0, bytesRead);
+		    }
+		}
+	
+	public static void linkStreams(InputStream input, OutputStream output)
+		    throws IOException
+		{
+		    byte[] buffer = new byte[1024]; // Adjust if you want
+		    int bytesRead;
+		    while ((bytesRead = input.read(buffer)) != -1)
 		    {
 		        output.write(buffer, 0, bytesRead);
 		    }
