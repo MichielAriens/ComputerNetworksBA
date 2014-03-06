@@ -88,7 +88,7 @@ public class Response extends Exchange {
 		if(file.canRead()){
 			Response res = new Response(request.getMode() + " 200 OK", handler);
 			res.body = request.getPath();
-			res.headers += "\nContent-Length: " + file.length() + "\n"; 
+			res.headers += "Content-Length: " + file.length() + "\n"; 
 			return res;
 		}else{
 			return new Response(request.getMode() + " 404 Not Found", request.parent);

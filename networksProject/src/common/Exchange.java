@@ -42,7 +42,7 @@ public abstract class Exchange {
 				handler.writer.flush();
 				InputStream input = new FileInputStream(body);
 				linkStreams(input, handler.soc.getOutputStream());
-				handler.writeLine("");
+				handler.writeLine("");handler.writeLine("");
 			}
 			handler.flush();
 		}catch(IOException e){

@@ -16,8 +16,8 @@ public class Request extends Exchange{
 	private String httpCommand; 	
 	private String path;			
 	private String mode;			
-	private String headers;			
-	private String body;			
+	//private String headers;			
+	//private String body;			
 	
 	
 	public Request(String initialLine, ConnectionHandler connectionHandler) throws IllegalExchangeException {
