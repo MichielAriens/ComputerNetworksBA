@@ -2,8 +2,11 @@ package client;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -14,6 +17,7 @@ public class Receiver{
 	Scanner scan;
 	BasicHTTPClient basicClient;
 	private ArrayList<String> requests;
+	private int imageCount = 0;
 	public Receiver(Scanner scan,BasicHTTPClient basicClient){
 		this.scan = scan;
 		this.basicClient=basicClient;
@@ -72,13 +76,17 @@ public class Receiver{
 			
 				String currentLine = reader.readLine();
 				boolean flag = false;
+				int contentLengthImage=0;
 				while(!currentLine.isEmpty()){
 					flag = this.checkLine(currentLine);
+					contentLengthImage = this.checkForLength(currentLine);
 					System.out.println(currentLine);
 					currentLine =reader.readLine();
 				}
 				if(flag==true){
-					
+					String fileType = this.getFileType();
+					InputStream in = sock.getInputStream();
+					OutputStream out = new FileOutputStream(imageCount+"."+fileType);
 				}else{
 					String bodyLine = reader.readLine();
 					while(!bodyLine.isEmpty()){
@@ -112,6 +120,27 @@ public class Receiver{
 	}
 
 
+	private int checkForLength(String currentLine) {
+		if(currentLine.contains("Content-Length: ")){
+			String[] part = currentLine.split(" ");
+			return Integer.valueOf(part[1]);
+		}else return 0;
+	}
+
+
+	private String getFileType() {
+		if(basicClient.path.contains("jpg")){
+			return "jpg";
+		}else if(basicClient.path.contains("png")){
+			return "png";
+		}else if(basicClient.path.contains("bmp")){
+			return "bmp";
+		}else if(basicClient.path.contains("gif")){
+			return "gif";
+		}else return null;
+	}
+
+
 	private void findEmbeddedObject(String bodyLine) {
 		if(bodyLine.contains("src=\"")){
 			String[] parts =bodyLine.split("src=\"");
@@ -131,4 +160,19 @@ public class Receiver{
 		return currentLine.contains("image");
 		
 	}
+	
+	public static void linkStreams(InputStream input, OutputStream output, int amountOfBytes)
+		    throws IOException
+		{
+			byte b = 0;
+			while(amountOfBytes>0){
+				b = (byte) input.read;
+			}
+		    byte[] buffer = new byte[1024]; // Adjust if you want
+		    int bytesRead;
+		    while ((bytesRead = input.read(buffer)) != -1)
+		    {
+		        output.write(buffer, 0, bytesRead);
+		    }
+		}
 }
