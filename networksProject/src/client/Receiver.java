@@ -30,7 +30,7 @@ public class Receiver{
 		if(parts[0].equals("GET") || parts[0].equals("HEAD")){
 			writer.write(request);
 			writer.newLine();
-			if(parts[0].equals("HEAD") && parts[1].equals("connection")){
+			if(parts[0].equals("HEAD") && parts[1].equals("/connection")){
 				writer.write("Connection: close");
 				writer.newLine();
 			}
@@ -81,7 +81,7 @@ public class Receiver{
 					
 				}else{
 					String bodyLine = reader.readLine();
-					while(bodyLine!=null){
+					while(!bodyLine.isEmpty()){
 						System.out.println(bodyLine);
 						this.findEmbeddedObject(bodyLine);
 						bodyLine=reader.readLine();
@@ -93,13 +93,17 @@ public class Receiver{
 					if(requests.isEmpty()){
 						basicClient.executeWithReconnect(basicClient.host+":"+sock.getPort()+"/connection", "HEAD");
 					}else{
-						basicClient.executeWithReconnect(requests.get(0), "GET");
+						String theRequest = requests.get(0);
+						requests.remove(0);
+						basicClient.executeWithReconnect(theRequest, "GET");
 					}
 				}else if(parts[2].equals("HTTP/1.1")){
 					if(requests.isEmpty()){
 						basicClient.executeWithoutReconnect(basicClient.host+":"+sock.getPort()+"/connection", "HEAD");
 					}else{
-						basicClient.executeWithoutReconnect(requests.get(0), "GET");
+						String theRequest = requests.get(0);
+						requests.remove(0);
+						basicClient.executeWithoutReconnect(theRequest, "GET");
 					}
 				}
 			

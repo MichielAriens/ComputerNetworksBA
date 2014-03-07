@@ -100,13 +100,16 @@ public class BasicHTTPClient {
 		if(parts1.length==1){
 			returnString[0] = "80";
 			returnString[1] = parts1[0];
+			return returnString;
 		}else if(parts1.length==2){
 			String host1 = parts1[0];
 			String[] parts2 = parts1[1].split("/");
 			returnString[0] = parts2[0];
+			returnString[1] = host1;
 			for(int i=1;i<parts2.length;i++){
-				returnString[1] = returnString[1]+parts2[i];
+				returnString[1] = returnString[1]+"/"+parts2[i];
 			}
+			return returnString;
 		}return null;
 	}
 
