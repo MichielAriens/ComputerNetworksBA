@@ -30,7 +30,7 @@ public class Receiver{
 		if(parts[0].equals("GET") || parts[0].equals("HEAD")){
 			writer.write(request);
 			writer.newLine();
-			if(parts[0].equals("HEAD") || parts[1].equals("connection")){
+			if(parts[0].equals("HEAD") && parts[1].equals("connection")){
 				writer.write("Connection: close");
 				writer.newLine();
 			}
@@ -67,7 +67,7 @@ public class Receiver{
 				System.out.println(currentLine);
 				currentLine=reader.readLine();
 			}
-		//sock.close();
+		
 		}else if(parts[0].equals("GET")){
 			
 				String currentLine = reader.readLine();
@@ -81,13 +81,15 @@ public class Receiver{
 					
 				}else{
 					String bodyLine = reader.readLine();
-					while(!bodyLine.isEmpty()){
+					while(bodyLine!=null){
 						System.out.println(bodyLine);
 						this.findEmbeddedObject(bodyLine);
 						bodyLine=reader.readLine();
 					}
 				}
+				
 				if(parts[2].equals("HTTP/1.0")){
+					
 					if(requests.isEmpty()){
 						basicClient.executeWithReconnect(basicClient.host+":"+sock.getPort()+"/connection", "HEAD");
 					}else{
@@ -107,11 +109,12 @@ public class Receiver{
 
 
 	private void findEmbeddedObject(String bodyLine) {
-		if(bodyLine.contains("src=")){
+		if(bodyLine.contains("src=\"")){
 			String[] parts =bodyLine.split("src=\"");
+			
 			String[] link = parts[1].split("\"");
 			requests.add(link[0]);
-		}else if(bodyLine.contains("href=")){
+		}else if(bodyLine.contains("href=\"")){
 			String[] parts =bodyLine.split("href=\"");
 			String[] link = parts[1].split("\"");
 			requests.add(link[0]);

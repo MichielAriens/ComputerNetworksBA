@@ -134,7 +134,7 @@ public class BasicHTTPClient {
 		String hostMaker = parts[0];
 		String pathMaker="";
 		for(int i=1;i<parts.length;i++){
-			pathMaker = pathMaker+parts[i];
+			pathMaker = pathMaker+"/"+parts[i];
 		}
 		
 		host= hostMaker;
