@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ public class Receiver{
 	
 
 	public void sendRequest(String request, Socket sock) throws UnknownHostException, IOException{
-		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 		String[] parts = request.split(" ");
@@ -79,14 +79,21 @@ public class Receiver{
 				int contentLengthImage=0;
 				while(!currentLine.isEmpty()){
 					flag = this.checkLine(currentLine);
-					contentLengthImage = this.checkForLength(currentLine);
+					contentLengthImage = contentLengthImage+this.checkForLength(currentLine);
 					System.out.println(currentLine);
 					currentLine =reader.readLine();
 				}
 				if(flag==true){
 					String fileType = this.getFileType();
-					InputStream in = sock.getInputStream();
-					OutputStream out = new FileOutputStream(imageCount+"."+fileType);
+					String fileName = "temp/" + imageCount+"." + fileType;
+					System.out.println("Saving file to: " + System.getProperty("user.dir") + "/" + fileName);
+					OutputStream out = new FileOutputStream(fileName);
+					linkStreams(reader, new BufferedWriter(new OutputStreamWriter(out)), contentLengthImage);
+					out.flush();
+					System.out.println("done");
+					out.close();
+					
+					
 				}else{
 					String bodyLine = reader.readLine();
 					while(!bodyLine.isEmpty()){
@@ -161,18 +168,13 @@ public class Receiver{
 		
 	}
 	
-	public static void linkStreams(InputStream input, OutputStream output, int amountOfBytes)
-		    throws IOException
-		{
-			byte b = 0;
-			while(amountOfBytes>0){
-				b = (byte) input.read;
-			}
-		    byte[] buffer = new byte[1024]; // Adjust if you want
-		    int bytesRead;
-		    while ((bytesRead = input.read(buffer)) != -1)
-		    {
-		        output.write(buffer, 0, bytesRead);
-		    }
+	public void linkStreams(Reader input, Writer output, int amountOfBytes) throws IOException{	
+		int buffer = 0;
+		while(amountOfBytes > 0 && buffer != -1){
+			
+			buffer = input.read();
+			output.write(buffer);
+			amountOfBytes--;System.out.println(amountOfBytes + ": " + buffer);
 		}
+	}
 }

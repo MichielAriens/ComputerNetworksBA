@@ -3,6 +3,7 @@ package common;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -98,7 +99,7 @@ public class Response extends Exchange {
 		if(file.canRead()){
 			Response res = new Response(request.getMode() + " 200 OK", handler);
 			res.body = request.getPath();
-			res.headers += "Content-Length: " + file.length() + "\n";
+			res.headers += "Content-Length: " + measureLength(request.getPath()) + "\n";
 			if(isImage(request.getPath())){
 				res.headers += "Content-Type: image";
 			}
@@ -142,5 +143,21 @@ public class Response extends Exchange {
 		        output.write(buffer, 0, bytesRead);
 		    }
 		}
+	
+	
+	public static int measureLength(String path){
+		try{
+			FileInputStream in = new FileInputStream(path);
+			int count = 0;
+			int buffer = 0;
+			while(buffer != -1){
+				count++;
+			}
+			in.close();
+			return count;
+		}catch(IOException e){
+			return -1;
+		}
+	}
 
 }
