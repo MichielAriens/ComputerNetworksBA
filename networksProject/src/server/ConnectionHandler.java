@@ -16,10 +16,17 @@ import common.IllegalExchangeException;
 import common.Request;
 import common.Response;
 
+/**
+ * Handles one connected client.
+ * @author Michiel & Wander
+ *
+ */
 public class ConnectionHandler implements Runnable {
+	//All supported commands
 	public static final List<String> COMMANDS;
+	//all supported commands
 	public static final List<String> PROTOCOLS;
-	
+
 	static{
 		String[] arr = {"GET","POST","HEAD","PUT"};
 		COMMANDS = Arrays.asList(arr);
@@ -30,17 +37,21 @@ public class ConnectionHandler implements Runnable {
 	
 	
 	public final Socket soc;
-	private List<Request> requests; // FIFO request queue on this ConnectionHandler.
-	
 	public BufferedReader reader = null;
 	public BufferedWriter writer = null;
 	
 	public ConnectionHandler(Socket soc) {
 		System.out.println("NEW THREAD!");
 		this.soc = soc;
-		this.requests = new ArrayList<Request>();
+		//this.requests = new ArrayList<Request>();
 	}
 	
+	/**
+	 * Wrapper around reader.readline().
+	 * Prints IO to server's terminal.
+	 * Ignores exception handling
+	 * @return
+	 */
 	public String readLine(){
 		try {
 			String s = this.reader.readLine();
@@ -52,6 +63,10 @@ public class ConnectionHandler implements Runnable {
 		}
 	}
 	
+	/**
+	 * Wrapper around writer.flush()
+	 * Ignores exception handling
+	 */
 	public void flush(){
 		try {
 			this.writer.flush();
@@ -61,6 +76,12 @@ public class ConnectionHandler implements Runnable {
 		}
 	}
 	
+	/**
+	 * Wrapper around writer.write() and writer.newLine(). 
+	 * Prints IO to server's terminal.
+	 * Ignores exception handling.
+	 * @param line
+	 */
 	public void writeLine(String line){
 		try {
 			this.writer.write(line);
@@ -71,6 +92,10 @@ public class ConnectionHandler implements Runnable {
 		}
 	}
 
+	/**
+	 * The main method.
+	 * Will accept 
+	 */
 	@Override
 	public void run() {
 		
@@ -94,11 +119,14 @@ public class ConnectionHandler implements Runnable {
 						response.printTo(this);
 					}
 				}
+				soc.close();
 			
 		} catch (IOException e) {
 			try {reader.close();} catch (IOException e1) {/*Well, screw it...*/}	
 			try {writer.close();} catch (IOException e1) {/*Well, screw it...*/}
 		} catch (IllegalExchangeException e) {
+		} catch (NullPointerException e){
+			//this sometimes happens when using propper clients.  
 		}
 	}
 

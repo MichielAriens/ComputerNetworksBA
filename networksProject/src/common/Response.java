@@ -12,11 +12,21 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
 
 import server.ConnectionHandler;
 
 
 public class Response extends Exchange {
+	
+	//All supported image formats
+	public static final List<String> IMAGEFORMATS;
+
+	static{
+		String[] arr = {"jpg","bmp","png","gif"};
+		IMAGEFORMATS = Arrays.asList(arr);
+	}
 	
 	
 
@@ -88,7 +98,10 @@ public class Response extends Exchange {
 		if(file.canRead()){
 			Response res = new Response(request.getMode() + " 200 OK", handler);
 			res.body = request.getPath();
-			res.headers += "Content-Length: " + file.length() + "\n"; 
+			res.headers += "Content-Length: " + file.length() + "\n";
+			if(isImage(request.getPath())){
+				res.headers += "Content-Type: image";
+			}
 			return res;
 		}else{
 			return new Response(request.getMode() + " 404 Not Found", request.parent);
@@ -96,6 +109,18 @@ public class Response extends Exchange {
 		
 	}
 	
+	private static boolean isImage(String path) {
+		for(String type : IMAGEFORMATS){
+			if(path.endsWith(type)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
+
 	public static void linkWriteToStream(Reader input, OutputStream output)
 		    throws IOException
 		{

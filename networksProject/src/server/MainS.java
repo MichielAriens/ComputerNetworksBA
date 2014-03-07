@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 public class MainS {
+	
+	/**
+	 * Start the server
+	 * @param a
+	 */
 	public static void main(String[] a){
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
 		BasicHTTPServer bs = new BasicHTTPServer();
