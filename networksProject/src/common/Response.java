@@ -99,7 +99,17 @@ public class Response extends Exchange {
 		if(file.canRead()){
 			Response res = new Response(request.getMode() + " 200 OK", handler);
 			res.body = request.getPath();
-			res.headers += "Content-Length: " + measureLength(request.getPath()) + "\n";
+			long contentLength = file.length();
+			/**
+			try {
+				System.out.println("system file length: " + file.length());
+				
+				contentLength = measureLength(request.getPath());
+			} catch (IOException e) {
+				System.out.println("     > !> Error reading file");
+				contentLength = file.length();
+			}*/
+			res.headers += "Content-Length: " + contentLength + "\n";
 			if(isImage(request.getPath())){
 				res.headers += "Content-Type: image";
 			}
@@ -145,19 +155,24 @@ public class Response extends Exchange {
 		}
 	
 	
-	public static int measureLength(String path){
-		try{
-			FileInputStream in = new FileInputStream(path);
-			int count = 0;
-			int buffer = 0;
-			while(buffer != -1){
-				count++;
-			}
-			in.close();
-			return count;
-		}catch(IOException e){
+	public static int measureLength(String path) throws IOException{
+		FileInputStream input;
+		try {
+			input = new FileInputStream(path);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return -1;
 		}
+		byte[] buffer = new byte[1024]; // Adjust if you want
+		int total =0;
+	    int bytesRead;
+	    while ((bytesRead = input.read(buffer)) != -1)
+	    {
+	        total+=bytesRead;
+	    }
+	    input.close();
+	    return total;
 	}
 
 }

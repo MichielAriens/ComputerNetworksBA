@@ -3,7 +3,9 @@ package client;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -83,12 +85,16 @@ public class Receiver{
 					System.out.println(currentLine);
 					currentLine =reader.readLine();
 				}
+				/**
+				 * Working here
+				 */
 				if(flag==true){
 					String fileType = this.getFileType();
 					String fileName = "temp/" + imageCount+"." + fileType;
 					System.out.println("Saving file to: " + System.getProperty("user.dir") + "/" + fileName);
-					OutputStream out = new FileOutputStream(fileName);
-					linkStreams(reader, new BufferedWriter(new OutputStreamWriter(out)), contentLengthImage);
+					//OutputStream out = new FileOutputStream(fileName);
+					FileWriter out = new FileWriter(fileName);
+					linkStreams(reader, out, contentLengthImage);
 					out.flush();
 					System.out.println("done");
 					out.close();
@@ -168,6 +174,18 @@ public class Receiver{
 		
 	}
 	
+	public static void linkStreams(Reader input, Writer output, int amount)
+		    throws IOException{
+	    char[] buffer = new char[1024];
+	    int bytesLeft = amount;
+	    int bytesRead;
+	    while (bytesLeft > 0){
+	    	bytesRead = input.read(buffer,0,Math.min(bytesLeft, 1024));
+	    	bytesLeft -= bytesRead;
+	        output.write(buffer, 0, bytesRead);
+	    }
+	}
+	/**
 	public void linkStreams(Reader input, Writer output, int amountOfBytes) throws IOException{	
 		int buffer = 0;
 		while(amountOfBytes > 0 && buffer != -1){
@@ -176,5 +194,5 @@ public class Receiver{
 			output.write(buffer);
 			amountOfBytes--;System.out.println(amountOfBytes + ": " + buffer);
 		}
-	}
+	}*/
 }
