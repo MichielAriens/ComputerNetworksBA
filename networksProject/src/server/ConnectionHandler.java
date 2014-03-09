@@ -22,6 +22,9 @@ import common.Response;
  *
  */
 public class ConnectionHandler implements Runnable {
+	public static int handlerNo = 0;
+	
+	
 	//All supported commands
 	public static final List<String> COMMANDS;
 	//all supported commands
@@ -35,13 +38,14 @@ public class ConnectionHandler implements Runnable {
 	}
 	
 	
-	
+	public int no;
 	public final Socket soc;
 	public BufferedReader reader = null;
 	public BufferedWriter writer = null;
 	
 	public ConnectionHandler(Socket soc) {
-		System.out.println("NEW THREAD!");
+		this.no = handlerNo++;
+		System.out.println("NEW THREAD: " + this.no);
 		this.soc = soc;
 		//this.requests = new ArrayList<Request>();
 	}
@@ -128,6 +132,7 @@ public class ConnectionHandler implements Runnable {
 		} catch (NullPointerException e){
 			//this sometimes happens when using propper clients.  
 		}
+		System.out.println("END THREAD: " + this.no);
 	}
 
 	private static boolean wellFormed(String initLine) {

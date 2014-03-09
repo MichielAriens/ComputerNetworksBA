@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -30,6 +31,7 @@ public class Receiver{
 	
 
 	public void sendRequest(String request, Socket sock) throws UnknownHostException, IOException{
+		//InputStream input = sock.getInputStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 		String[] parts = request.split(" ");
@@ -88,16 +90,26 @@ public class Receiver{
 				/**
 				 * Working here
 				 */
-				if(flag==true){
+				if(flag == true){
 					String fileType = this.getFileType();
 					String fileName = "temp/" + imageCount+"." + fileType;
 					System.out.println("Saving file to: " + System.getProperty("user.dir") + "/" + fileName);
-					//OutputStream out = new FileOutputStream(fileName);
-					FileWriter out = new FileWriter(fileName);
-					linkStreams(reader, out, contentLengthImage);
-					out.flush();
+					FileWriter fw = new FileWriter(fileName);
+					char[] buffer = new char[contentLengthImage];
+					int totalRead = 0;
+					sock.setSoTimeout(5000);
+					try{
+						while(totalRead < contentLengthImage){
+							totalRead += reader.read(buffer, totalRead, contentLengthImage - (totalRead));
+						}
+					}catch(SocketTimeoutException e){
+						//done
+					}
+					String data = String.valueOf(buffer);
+					data = String.valueOf(data.subSequence(0, data.length()));
+					fw.write(data);
+					fw.flush(); fw.close();
 					System.out.println("done");
-					out.close();
 					
 					
 				}else{
