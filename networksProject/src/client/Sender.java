@@ -2,12 +2,9 @@ package client;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -17,12 +14,12 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Receiver{
+public class Sender{
 	Scanner scan;
 	BasicHTTPClient basicClient;
 	private ArrayList<String> requests;
 	private int imageCount = 0;
-	public Receiver(Scanner scan,BasicHTTPClient basicClient){
+	public Sender(Scanner scan,BasicHTTPClient basicClient){
 		this.scan = scan;
 		this.basicClient=basicClient;
 		this.requests = new ArrayList<String>();
@@ -197,14 +194,5 @@ public class Receiver{
 	        output.write(buffer, 0, bytesRead);
 	    }
 	}
-	/**
-	public void linkStreams(Reader input, Writer output, int amountOfBytes) throws IOException{	
-		int buffer = 0;
-		while(amountOfBytes > 0 && buffer != -1){
-			
-			buffer = input.read();
-			output.write(buffer);
-			amountOfBytes--;System.out.println(amountOfBytes + ": " + buffer);
-		}
-	}*/
+	
 }
