@@ -96,8 +96,10 @@ public class Sender{
 					int totalRead = 0;
 					sock.setSoTimeout(5000);
 					try{
-						while(totalRead < contentLengthImage){
-							totalRead += reader.read(buffer, totalRead, contentLengthImage - (totalRead));
+						int read = 0;
+						while(totalRead < contentLengthImage && read != -1){
+							read = reader.read(buffer, totalRead, contentLengthImage - (totalRead) - 1);
+							totalRead += read;
 						}
 					}catch(SocketTimeoutException e){
 						//done
