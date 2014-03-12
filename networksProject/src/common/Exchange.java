@@ -1,22 +1,18 @@
 package common;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.Scanner;
 
 import server.ConnectionHandler;
 
 public abstract class Exchange {
 	
 	public boolean image = false;
-	public String initialLine; //Initial response line		
+	public String initialLine; //Initial request/response line		
 	public String headers = "Host: localhost:54321\nServer: Waitress 1.0\n";		
 	public String body = "";
 	public Exchange(String initialLine){
@@ -26,7 +22,10 @@ public abstract class Exchange {
 	
 
 	
-	
+	/**
+	 * Prints an exchange to the writer of the handler passed.
+	 * @param
+	 */
 	public void printTo(ConnectionHandler handler){
 		try{
 			handler.writeLine(initialLine);
@@ -40,6 +39,7 @@ public abstract class Exchange {
 			
 			if(body != ""){
 				handler.writer.flush();
+				//Hijack the handler's socket's outputstream.
 				InputStream input = new FileInputStream(body);
 				linkStreams(input, handler.soc.getOutputStream());
 				handler.writeLine("");handler.writeLine("");
@@ -50,6 +50,12 @@ public abstract class Exchange {
 		}
 	}
 	
+	/**
+	 * Writes from an inputstream into an outputstream until the inputstream is finished. 
+	 * @param input
+	 * @param output
+	 * @throws IOException
+	 */
 	public static void linkStreams(InputStream input, OutputStream output)
 		    throws IOException
 		{

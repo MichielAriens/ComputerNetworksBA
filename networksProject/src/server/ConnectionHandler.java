@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import common.IllegalExchangeException;
@@ -22,6 +19,7 @@ import common.Response;
  *
  */
 public class ConnectionHandler implements Runnable {
+	//Gives each client connection an easy reference number.
 	public static int handlerNo = 0;
 	
 	
@@ -37,7 +35,7 @@ public class ConnectionHandler implements Runnable {
 		PROTOCOLS = Arrays.asList(arr1);
 	}
 	
-	
+	//this specific handler's reference
 	public int no;
 	public final Socket soc;
 	public BufferedReader reader = null;
@@ -47,7 +45,6 @@ public class ConnectionHandler implements Runnable {
 		this.no = handlerNo++;
 		System.out.println("NEW THREAD: " + this.no);
 		this.soc = soc;
-		//this.requests = new ArrayList<Request>();
 	}
 	
 	/**
@@ -98,7 +95,7 @@ public class ConnectionHandler implements Runnable {
 
 	/**
 	 * The main method.
-	 * Will accept 
+	 * On default it accepts multiple requests on the same connection. This behaviour can be overridden by using HTTP/1.0 or sending Connection: close header.
 	 */
 	@Override
 	public void run() {
@@ -114,6 +111,7 @@ public class ConnectionHandler implements Runnable {
 				
 				while(holdConnection){
 					String initLine = this.readLine();
+					//ignore ill-formed requests.
 					if(wellFormed(initLine)){
 						activeRequest = new Request(initLine,this);
 						activeRequest.grow();
@@ -126,15 +124,20 @@ public class ConnectionHandler implements Runnable {
 				soc.close();
 			
 		} catch (IOException e) {
-			try {reader.close();} catch (IOException e1) {/*Well, screw it...*/}	
-			try {writer.close();} catch (IOException e1) {/*Well, screw it...*/}
+			try {reader.close();} catch (IOException e1) {/*Don't handle*/}	
+			try {writer.close();} catch (IOException e1) {/*Don't handle*/}
 		} catch (IllegalExchangeException e) {
 		} catch (NullPointerException e){
-			//this sometimes happens when using propper clients.  
+			//this sometimes happens when using proper clients. Catch and carry on.
 		}
 		System.out.println("END THREAD: " + this.no);
 	}
 
+	/**
+	 * Checks whether an initial line represents a valid initial-request-line. (COMMAND PATH PROTOCOL)
+	 * @param initLine
+	 * @return
+	 */
 	private static boolean wellFormed(String initLine) {
 		if (initLine.equals(""))
 			return false;

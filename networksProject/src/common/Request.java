@@ -1,10 +1,5 @@
 package common;
 
-import java.io.BufferedReader;
-import java.util.Date;
-import java.util.HashMap;
-
-import server.BasicHTTPServer;
 import server.ConnectionHandler;
 
 public class Request extends Exchange{
@@ -37,6 +32,55 @@ public class Request extends Exchange{
 		}
 	}
 	
+
+
+
+	/**
+	 * Reads in from the parent's reader to populate the header and body if required of this request.
+	 */
+	public void grow() {
+		int emptyLines = 0;
+		String nextLine;
+		//Read headers.
+		while(emptyLines < 1){
+			nextLine = parent.readLine();
+			if(nextLine.equals("")){
+				emptyLines++;
+			}else{
+				headers += nextLine + "\n";
+			}
+		}while(emptyLines < 2 && this.hasBody()){
+			nextLine = parent.readLine();
+			if(nextLine.equals("")){
+				emptyLines++;
+			}else{
+				body += nextLine + "\n";
+			}
+		}
+		
+		
+	}
+
+
+	/**
+	 * Checks whether this type of request is expecting a body.
+	 * @return		true <=> expecting a body
+	 */
+	private boolean hasBody() {
+		return (this.httpCommand.equals("POST") || this.httpCommand.equals("PUT"));
+	}
+
+
+	/**
+	 * Checks whether the headers of this object contains a Connection: close directive.
+	 * @return	true <=> headers contains "Connection: close" header 
+	 */
+	public boolean toClose() {
+		return this.headers.contains("Connection: close");
+	}
+	
+	
+	/** GETTERS & SETTERS BELOW **/
 
 	public String getPath() {
 		return path;
@@ -94,48 +138,6 @@ public class Request extends Exchange{
 
 	public void setHttpCommand(String com){
 		this.httpCommand = com;
-	}
-
-	private String headers(){
-		return null;
-	}
-
-
-
-	/**
-	 * 
-	 */
-	public void grow() {
-		int emptyLines = 0;
-		String nextLine;
-		//Read headers.
-		while(emptyLines < 1){
-			nextLine = parent.readLine();
-			if(nextLine.equals("")){
-				emptyLines++;
-			}else{
-				headers += nextLine + "\n";
-			}
-		}while(emptyLines < 2 && this.hasBody()){
-			nextLine = parent.readLine();
-			if(nextLine.equals("")){
-				emptyLines++;
-			}else{
-				body += nextLine + "\n";
-			}
-		}
-		
-		
-	}
-
-
-	private boolean hasBody() {
-		return (this.httpCommand.equals("POST") || this.httpCommand.equals("PUT"));
-	}
-
-
-	public boolean toClose() {
-		return this.headers.contains("Connection: close");
 	}
 
 }

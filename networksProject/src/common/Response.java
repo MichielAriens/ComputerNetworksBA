@@ -1,18 +1,10 @@
 package common;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,7 +13,7 @@ import server.ConnectionHandler;
 
 public class Response extends Exchange {
 	
-	//All supported image formats
+	//All supported image formats: Supported means we'll send a "Content-type: image" header.
 	public static final List<String> IMAGEFORMATS;
 
 	static{
@@ -30,9 +22,16 @@ public class Response extends Exchange {
 	}
 	
 	
-
+	private ConnectionHandler parent;
+	
+	/**
+	 * Basic contructor
+	 * @param initialLine
+	 * @param parent
+	 */
 	public Response(String initialLine, ConnectionHandler parent) {
 		super(initialLine);
+		this.parent = parent;
 	}
 	
 	
@@ -42,6 +41,12 @@ public class Response extends Exchange {
 	 * END OF NON STATIC METHODS
 	 */
 	
+	/**
+	 * Given a request this method calls the correct method to handle the creation of the response object.
+	 * @param request
+	 * @param handler
+	 * @return
+	 */
 	public static Response getResponseTo(Request request, ConnectionHandler handler){
 		if (request.getHttpCommand().equals("GET")){
 			return getResponseToGET(request, handler);
@@ -56,13 +61,28 @@ public class Response extends Exchange {
 		}
 	}
 	
-	
+	/**
+	 * Given a POST request, this method actuates the request and creates an appropriate response object 
+	 * 
+	 * POST request input is printed to the commandline. 
+	 * @param request	a POST request
+	 * @param handler	a connectionHandler
+	 * @return			appropriate response object
+	 */
 	private static Response getResponseToPOST(Request request, ConnectionHandler handler) {
 			Response res = new Response(request.getMode() + " 200 OK", handler);
 			System.out.println("      > POST: " + request.getBody());
 			return res;
 		}
 
+	/**
+	 * Given a HEAD request, this method actuates the request and creates an appropriate response object 
+	 * 
+	 * POST request input is printed to the commandline. 
+	 * @param request	a HEAD request
+	 * @param handler	a connectionHandler
+	 * @return			appropriate response object
+	 */
 	private static Response getResponseToHEAD(Request request, ConnectionHandler handler) {
 		File file = new File(request.getPath());
 		if(file.canRead()){
@@ -76,7 +96,16 @@ public class Response extends Exchange {
 
 
 
-
+	/**
+	 * Given a PUT request, this method actuates the request and creates an appropriate response object 
+	 * 
+	 * The body of the PUT requst is saved in a file marked by path if possible. 403 Forbidden is returned if permissions are lacking.
+	 * 
+	 * POST request input is printed to the commandline. 
+	 * @param request	a PUT request
+	 * @param handler	a connectionHandler
+	 * @return			appropriate response object
+	 */
 	private static Response getResponseToPUT(Request request, ConnectionHandler handler) {
 		try {
 			File file = new File(request.getPath());
@@ -87,28 +116,31 @@ public class Response extends Exchange {
 				linkStreams(in, out);
 				return res;
 			}else{
-				return new Response(request.getMode() + " 404 Not Found", request.parent);
+				return new Response(request.getMode() + " 403 Forbidden", request.parent);
 			}
 		} catch (IOException e) {
-			return new Response(request.getMode() + " 404 Not Found", request.parent);
+			return new Response(request.getMode() + " 500 Server Error", request.parent);
 		}
 	}
 	
+	/**
+	 * Given a GET request, this method actuates the request and creates an appropriate response object 
+	 * 
+	 * The content length is acquired from the filesystem and incorporated in the headers.
+	 * The body of the response is a link to the file to load and is read in the Exchange printTo(...) method
+	 * 404 Not Found is returned if the file does not exist or can't be read.
+	 * 
+	 * POST request input is printed to the commandline. 
+	 * @param request	a PUT request
+	 * @param handler	a connectionHandler
+	 * @return			appropriate response object
+	 */
 	private static Response getResponseToGET(Request request, ConnectionHandler handler) {
 		File file = new File(request.getPath());
 		if(file.canRead()){
 			Response res = new Response(request.getMode() + " 200 OK", handler);
 			res.body = request.getPath();
 			long contentLength = file.length();
-			/**
-			try {
-				System.out.println("system file length: " + file.length());
-				
-				contentLength = measureLength(request.getPath());
-			} catch (IOException e) {
-				System.out.println("     > !> Error reading file");
-				contentLength = file.length();
-			}*/
 			res.headers += "Content-Length: " + contentLength + "\n";
 			if(isImage(request.getPath())){
 				res.headers += "Content-Type: image";
@@ -120,6 +152,11 @@ public class Response extends Exchange {
 		
 	}
 	
+	/**
+	 * Checks whether the "Content-Type: image" header is appropriate. 
+	 * @param path
+	 * @return	true <=> IMAGEFORMATS contains the extention of path.
+	 */
 	private static boolean isImage(String path) {
 		for(String type : IMAGEFORMATS){
 			if(path.endsWith(type)){
@@ -127,52 +164,6 @@ public class Response extends Exchange {
 			}
 		}
 		return false;
-	}
-
-
-
-
-	public static void linkWriteToStream(Reader input, OutputStream output)
-		    throws IOException
-		{
-		    byte[] buffer = new byte[1024]; // Adjust if you want
-		    int bytesRead;
-		    while ((bytesRead = input.read()) != -1)
-		    {
-		        output.write(buffer, 0, bytesRead);
-		    }
-		}
-	
-	public static void linkStreams(InputStream input, OutputStream output)
-		    throws IOException
-		{
-		    byte[] buffer = new byte[1024]; // Adjust if you want
-		    int bytesRead;
-		    while ((bytesRead = input.read(buffer)) != -1)
-		    {
-		        output.write(buffer, 0, bytesRead);
-		    }
-		}
-	
-	
-	public static int measureLength(String path) throws IOException{
-		FileInputStream input;
-		try {
-			input = new FileInputStream(path);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return -1;
-		}
-		byte[] buffer = new byte[1024]; // Adjust if you want
-		int total =0;
-	    int bytesRead;
-	    while ((bytesRead = input.read(buffer)) != -1)
-	    {
-	        total+=bytesRead;
-	    }
-	    input.close();
-	    return total;
 	}
 
 }
