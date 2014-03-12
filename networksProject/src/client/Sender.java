@@ -2,10 +2,14 @@ package client;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -62,8 +66,9 @@ public class Sender{
 	 * @throws IOException	If there is something wrong with the sockets.
 	 */
 	public void sendRequest(String request, Socket sock) throws UnknownHostException, IOException{
-		//InputStream input = sock.getInputStream();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+		InputStream input = sock.getInputStream();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input),1);
+		//Reader reader = new InputStreamReader(input);
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 		String[] parts = request.split(" ");
 		if(parts[0].equals("GET") || parts[0].equals("HEAD")){
@@ -125,22 +130,13 @@ public class Sender{
 					String fileType = this.getFileType();
 					String fileName = "temp/" + imageCount+"." + fileType;
 					System.out.println("Saving file to: " + System.getProperty("user.dir") + "/" + fileName);
-					FileWriter fw = new FileWriter(fileName);
-					char[] buffer = new char[contentLengthImage];
-					int totalRead = 0;
-					sock.setSoTimeout(5000);
+					FileOutputStream fw = new FileOutputStream(fileName);
+					sock.setSoTimeout(5000);					
 					try{
-						int read = 0;
-						while(totalRead < contentLengthImage && read != -1){
-							read = reader.read(buffer, totalRead, contentLengthImage - (totalRead) - 1);
-							totalRead += read;
-						}
+						linkStreams(input, fw);
 					}catch(SocketTimeoutException e){
 						//done
 					}
-					String data = String.valueOf(buffer);
-					data = String.valueOf(data.subSequence(0, data.length()));
-					fw.write(data);
 					fw.flush(); fw.close();
 					System.out.println("done");
 					
@@ -234,5 +230,41 @@ public class Sender{
 		
 	}
 	
+	public static void linkStreams(InputStream input, OutputStream output)
+		    throws IOException
+		{
+		    byte[] buffer = new byte[1024]; // Adjust if you want
+		    int bytesRead;
+		    while ((bytesRead = input.read(buffer)) != -1)
+		    {
+		        output.write(buffer, 0, bytesRead);
+		    }
+		}
+	
+	/*
+	public static void linkStreams(Reader input, Writer output, int amount)
+		    throws IOException{
+	    char[] buffer = new char[1024];
+	    int bytesLeft = amount;
+	    int bytesRead;
+	    while (bytesLeft > 0){
+	    	bytesRead = input.read(buffer,0,Math.min(bytesLeft, 1024));
+	    	bytesLeft -= bytesRead;
+	        output.write(buffer, 0, bytesRead);
+	    }
+	}
+	
+	
+	
+	public void linkStreams(Reader input, Writer output, int amountOfBytes) throws IOException{	
+		int buffer = 0;
+		while(amountOfBytes > 0 && buffer != -1){
+			
+			buffer = input.read();
+			output.write(buffer);
+			amountOfBytes--;System.out.println(amountOfBytes + ": " + buffer);
+		}
+	}
+*/
 	
 }
