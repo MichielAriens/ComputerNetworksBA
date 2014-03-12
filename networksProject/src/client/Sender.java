@@ -6,19 +6,44 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * This class is used to send a request through a socket.
+ * 
+ *
+ */
 public class Sender{
+	
+	/**
+	 * The scanner used for reading input, that is requested for some requests.
+	 */
 	Scanner scan;
+	
+	/**
+	 * A variable holding the the basicHTTPClient class, which is responsible for URI decomposition. 
+	 */
 	BasicHTTPClient basicClient;
+	
+	/**
+	 * A list holding all the pending requests.
+	 */
 	private ArrayList<String> requests;
+	
+	/**
+	 * A variable holding the total images past.
+	 */
 	private int imageCount = 0;
+	
+	/**
+	 * Creates a Sender object and initializes the scanner, the basicHTTPClient and the request list.
+	 * @param scan	The scanner for asking input.
+	 * @param basicClient	The basicHTTPClient for new connections and URI decomposition.
+	 */
 	public Sender(Scanner scan,BasicHTTPClient basicClient){
 		this.scan = scan;
 		this.basicClient=basicClient;
@@ -26,7 +51,16 @@ public class Sender{
 		
 	}
 	
-
+	/**
+	 * This method checks the request and splits it into a few parts. It checks the HTTPCommand and 
+	 * bufferedwriter to send to the server through the given socket. Then it waits for a response
+	 * from the server it is connected to. If it was a GET command, it checks for embedded objects and 
+	 * depending on the HTTP version, makes a new connection or keeps the connection alive.
+	 * @param request	The request to be send to the server.
+	 * @param sock	The socket used for this request.
+	 * @throws UnknownHostException	If the host cannot be found.
+	 * @throws IOException	If there is something wrong with the sockets.
+	 */
 	public void sendRequest(String request, Socket sock) throws UnknownHostException, IOException{
 		//InputStream input = sock.getInputStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -143,7 +177,11 @@ public class Sender{
 		
 	}
 
-
+	/**
+	 * If the line contains content length, returns the number after it, which is the content length.
+	 * @param currentLine The line in which we look for the content length.
+	 * @return The content length.
+	 */
 	private int checkForLength(String currentLine) {
 		if(currentLine.contains("Content-Length: ")){
 			String[] part = currentLine.split(" ");
@@ -151,7 +189,10 @@ public class Sender{
 		}else return 0;
 	}
 
-
+	/**
+	 * Returns a string of the image type.
+	 * @return	The string containing the image type.
+	 */
 	private String getFileType() {
 		if(basicClient.path.contains("jpg")){
 			return "jpg";
@@ -164,7 +205,10 @@ public class Sender{
 		}else return null;
 	}
 
-
+	/**
+	 * Checks the given line for embedded objects and adds them to the request queue.
+	 * @param bodyLine The line in which we check for embedded objects.
+	 */
 	private void findEmbeddedObject(String bodyLine) {
 		if(bodyLine.contains("src=\"")){
 			String[] parts =bodyLine.split("src=\"");
@@ -179,22 +223,16 @@ public class Sender{
 		
 	}
 
-
+	/**
+	 * Checks if the line contains image, if so, returns true, else returns false.
+	 * @param currentLine	The line to check for the string image.
+	 * @return True if the given line contains image.
+	 * 			False otherwise.
+	 */
 	private boolean checkLine(String currentLine) {
 		return currentLine.contains("image");
 		
 	}
 	
-	public static void linkStreams(Reader input, Writer output, int amount)
-		    throws IOException{
-	    char[] buffer = new char[1024];
-	    int bytesLeft = amount;
-	    int bytesRead;
-	    while (bytesLeft > 0){
-	    	bytesRead = input.read(buffer,0,Math.min(bytesLeft, 1024));
-	    	bytesLeft -= bytesRead;
-	        output.write(buffer, 0, bytesRead);
-	    }
-	}
 	
 }
