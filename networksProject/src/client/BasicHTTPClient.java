@@ -51,8 +51,6 @@ public class BasicHTTPClient {
 	 * attempts to connect to a given host and port. It checks the HTTP version and then tries to send 
 	 * the request through sender.
 	 * @param arguments	The arguments given to the main method.
-	 * @throws UnknownHostException If the host cannot be found.
-	 * @throws IOException If there is a problem with the sockets.
 	 */
 	public void requestNewCommand(String[] arguments) {
 		arguments[1] = this.deletehttpthing(arguments[1]);
@@ -89,8 +87,6 @@ public class BasicHTTPClient {
 	 * After the new connection has been made, sends the request through sender.
 	 * @param URI	The URI used for the next request.
 	 * @param HTTPCommand	The HTTP command used for the next request.
-	 * @throws UnknownHostException If the host cannot be found.
-	 * @throws IOException If there is a problem with the sockets.
 	 */
 	public void executeWithReconnect(String URI,String HTTPCommand) {
 		URI = this.deletehttpthing(URI);
@@ -113,8 +109,6 @@ public class BasicHTTPClient {
 	 * before. Then sends the request through sender. Important is that no new connection is made.
 	 * @param URI	The URI used for the next request.
 	 * @param HTTPCommand	The HTTP command used for the next request.
-	 * @throws UnknownHostException If the host cannot be found.
-	 * @throws IOException If there is a problem with the sockets.
 	 */
 	public void executeWithoutReconnect(String URI,String HTTPCommand) {
 		URI = this.deletehttpthing(URI);
@@ -167,9 +161,6 @@ public class BasicHTTPClient {
 	 * Uses the created host and given port to make a connection through sockets.
 	 * @param URI	The URI containing a path and host.
 	 * @param port	The port on which we would like to connect.
-	 * @throws NumberFormatException If the port cannot be parsed to an integer.
-	 * @throws UnknownHostException If the host cannot be found.
-	 * @throws IOException If there is something wrong with the sockets.
 	 */
 	private void connect(String URI,String port) {
 		
